@@ -128,6 +128,7 @@ bundle = NbxBundle(nbname="index.ipynb",
           time=[2,0], 
           ntasks=4, 
           step=5, 
+          mail_user="mirko.klukas@gmail.com",
           simg="mirko-datascience.simg")
 ```
 

@@ -159,6 +159,7 @@ def check_parsed_nb(pnb):
 class NbxBundle():
     def __init__(self,
                  nbname,
+                 mail_user,
                  name=None,
                  linting=True,
                  time=[1,0],
@@ -201,7 +202,7 @@ class NbxBundle():
             'ntasks': ntasks,
             'script': 'wrapper.py',
             'simg': Path(os.environ['omsimg'])/simg,
-            'mail_user': "mirko.klukas@gmail.com",
+            'mail_user': mail_user,
             'mem_per_cpu': 2000
         })
 
