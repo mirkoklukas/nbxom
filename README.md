@@ -16,9 +16,19 @@
 # Getting started
 
 ## Prerequisites
-Install the package
+**1.** Install the package:
 
-For the modules to work you have to set the environment variables `om`, `omx`, and `omsimg`:  
+- `pip install nbx`
+
+**2.** Get a singulartiy that has the package installed. Here's one you can built yourself:
+
+```shell
+module load openmind/singularity/3.2.0
+export SINGULARITY_CACHEDIR="/om2/user/{your_user_name}/.singularity"
+singularity build pytorch.simg docker://mklukas/pytorch
+```
+
+**3.** For the modules to work you have to set the environment variables `om`, `omx`, and `omsimg`:  
 
 - **om**: your login to *OpenMind*. 
     - You need to enable logging into *OpenMind* using public key authentication. That means the command `ssh $om` should log you in whithout asking for a password. (googling for "ssh public key authentication" will provide you with a recipe like [this](https://kb.iu.edu/d/aews))
@@ -27,11 +37,13 @@ For the modules to work you have to set the environment variables `om`, `omx`, a
 
 Mac users can adapt and copy the following lines to their `.bash_profile`
 
-```bash
+```shell
 export om={your_user_name}@openmind7.mit.edu
 export omx=/om2/user/{your_user_name}/nbx-experiments
 export omsimg=/om2/user/{your_user_name}/simg
 ```
+
+
 
 ## Usage
 
@@ -54,6 +66,13 @@ export omsimg=/om2/user/{your_user_name}/simg
 %load_ext autoreload
 %autoreload 2
 ```
+
+</div>
+<div class="output_area" markdown="1">
+
+    The autoreload extension is already loaded. To reload it, use:
+      %reload_ext autoreload
+
 
 </div>
 
@@ -84,6 +103,23 @@ z=0;
 <div class="input_area" markdown="1">
 
 ```python
+#nbx
+print("my results:", x, y, z)
+```
+
+</div>
+<div class="output_area" markdown="1">
+
+    my results: 0 0 0
+
+
+</div>
+
+</div>
+<div class="codecell" markdown="1">
+<div class="input_area" markdown="1">
+
+```python
 from nbx.om import NbxBundle
 
 bundle = NbxBundle(nbname="index.ipynb", 
@@ -98,6 +134,10 @@ bundle = NbxBundle(nbname="index.ipynb",
 </div>
 <div class="output_area" markdown="1">
 
+    [('task_id', '0', ''), ('results_dir', '"./"', ''), ('x', '0', ''), ('y', '0', '[0,1,2,3,4]')]
+    /Users/mirko/Workspace/nbx/nbx/templates/experiment.tpl
+    /Users/mirko/Workspace/nbx/nbx/templates/wrapper.tpl
+    /Users/mirko/Workspace/nbx/nbx/templates/run.tpl
     
     ** nbx bundle created **
     Path:
@@ -133,10 +173,17 @@ bundle = NbxBundle(nbname="index.ipynb",
 </div>
 <div class="output_area" markdown="1">
 
-    Traceback (most recent call last):
-      File "test_nbx/experiment.py", line 6, in <module>
-        from nbx.pspace import ParameterSpace
-    ModuleNotFoundError: No module named 'nbx'
+    **nbx**
+    Running Experiment...
+    	kwargs: {}
+    	y: 0
+    	x: 0
+    	results_dir: ./
+    	task_id: 0
+    my results: 0 0 0
+    
+    **nbx**
+    Experiment finished.
 
 
 </div>
@@ -146,13 +193,48 @@ bundle = NbxBundle(nbname="index.ipynb",
 <div class="input_area" markdown="1">
 
 ```python
-!nbdev_build_docs
+!scp -r test_nbx $om:$omx
 ```
 
 </div>
 <div class="output_area" markdown="1">
 
-    converting: /Users/mirko/Workspace/nbx-om/nbs/index.ipynb
+    wrapper.py                                    100%  950   106.0KB/s   00:00    
+    __init__.py                                   100%    0     0.0KB/s   00:00    
+    run.sh                                        100%  732   117.9KB/s   00:00    
+    experiment.py                                 100%  739    78.9KB/s   00:00    
+
+
+</div>
+
+</div>
+<div class="codecell" markdown="1">
+<div class="input_area" markdown="1">
+
+```python
+!ssh $om sbatch -D $omx/test_nbx $omx/test_nbx/run.sh
+```
+
+</div>
+<div class="output_area" markdown="1">
+
+    Submitted batch job 15969897
+
+
+</div>
+
+</div>
+<div class="codecell" markdown="1">
+<div class="input_area" markdown="1">
+
+```python
+!ssh $om squeue -u $omid
+```
+
+</div>
+<div class="output_area" markdown="1">
+
+                 JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
 
 
 </div>

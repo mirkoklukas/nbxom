@@ -29,8 +29,16 @@ summary: "This module enables you to quickly convert your jupyter notebook into 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Prerequisites">Prerequisites<a class="anchor-link" href="#Prerequisites">&#182;</a></h2><p>Install the package</p>
-<p>For the modules to work you have to set the environment variables <code>om</code>, <code>omx</code>, and <code>omsimg</code>:</p>
+<h2 id="Prerequisites">Prerequisites<a class="anchor-link" href="#Prerequisites">&#182;</a></h2><p><strong>1.</strong> Install the package:</p>
+<ul>
+<li><code>pip install nbx</code></li>
+</ul>
+<p><strong>2.</strong> Get a singulartiy that has the package installed. Here's one you can built yourself:</p>
+<div class="highlight"><pre><span></span>module load openmind/singularity/3.2.0
+<span class="nb">export</span> <span class="nv">SINGULARITY_CACHEDIR</span><span class="o">=</span><span class="s2">&quot;/om2/user/{your_user_name}/.singularity&quot;</span>
+singularity build pytorch.simg docker://mklukas/pytorch
+</pre></div>
+<p><strong>3.</strong> For the modules to work you have to set the environment variables <a href="/om.html"><code>om</code></a>, <code>omx</code>, and <code>omsimg</code>:</p>
 <ul>
 <li><strong>om</strong>: your login to <em>OpenMind</em>. <ul>
 <li>You need to enable logging into <em>OpenMind</em> using public key authentication. That means the command <code>ssh $om</code> should log you in whithout asking for a password. (googling for "ssh public key authentication" will provide you with a recipe like <a href="https://kb.iu.edu/d/aews">this</a>)</li>
@@ -80,6 +88,21 @@ summary: "This module enables you to quickly convert your jupyter notebook into 
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>The autoreload extension is already loaded. To reload it, use:
+  %reload_ext autoreload
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -111,6 +134,34 @@ summary: "This module enables you to quickly convert your jupyter notebook into 
 
 <div class="inner_cell">
     <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#nbx</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;my results:&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>my results: 0 0 0
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">nbx.om</span> <span class="k">import</span> <span class="n">NbxBundle</span>
 
 <span class="n">bundle</span> <span class="o">=</span> <span class="n">NbxBundle</span><span class="p">(</span><span class="n">nbname</span><span class="o">=</span><span class="s2">&quot;index.ipynb&quot;</span><span class="p">,</span> 
@@ -132,7 +183,11 @@ summary: "This module enables you to quickly convert your jupyter notebook into 
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>
+<pre>[(&#39;task_id&#39;, &#39;0&#39;, &#39;&#39;), (&#39;results_dir&#39;, &#39;&#34;./&#34;&#39;, &#39;&#39;), (&#39;x&#39;, &#39;0&#39;, &#39;&#39;), (&#39;y&#39;, &#39;0&#39;, &#39;[0,1,2,3,4]&#39;)]
+/Users/mirko/Workspace/nbx/nbx/templates/experiment.tpl
+/Users/mirko/Workspace/nbx/nbx/templates/wrapper.tpl
+/Users/mirko/Workspace/nbx/nbx/templates/run.tpl
+
 ** nbx bundle created **
 Path:
     test_nbx
@@ -178,10 +233,17 @@ Instructions:
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Traceback (most recent call last):
-  File &#34;test_nbx/experiment.py&#34;, line 6, in &lt;module&gt;
-    from nbx.pspace import ParameterSpace
-ModuleNotFoundError: No module named &#39;nbx&#39;
+<pre>**nbx**
+Running Experiment...
+	kwargs: {}
+	y: 0
+	x: 0
+	results_dir: ./
+	task_id: 0
+my results: 0 0 0
+
+**nbx**
+Experiment finished.
 </pre>
 </div>
 </div>
@@ -195,7 +257,7 @@ ModuleNotFoundError: No module named &#39;nbx&#39;
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>nbdev_build_docs
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>scp -r test_nbx <span class="nv">$om</span>:<span class="nv">$omx</span>
 </pre></div>
 
     </div>
@@ -208,7 +270,64 @@ ModuleNotFoundError: No module named &#39;nbx&#39;
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>converting: /Users/mirko/Workspace/nbx-om/nbs/index.ipynb
+<pre>wrapper.py                                    100%  950   106.0KB/s   00:00    
+__init__.py                                   100%    0     0.0KB/s   00:00    
+run.sh                                        100%  732   117.9KB/s   00:00    
+experiment.py                                 100%  739    78.9KB/s   00:00    
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>ssh <span class="nv">$om</span> sbatch -D <span class="nv">$omx</span>/test_nbx <span class="nv">$omx</span>/test_nbx/run.sh
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Submitted batch job 15969897
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>ssh <span class="nv">$om</span> squeue -u <span class="nv">$omid</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
 </pre>
 </div>
 </div>
