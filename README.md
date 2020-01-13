@@ -25,7 +25,7 @@ Fill me in please! Don't forget code examples:
 <div class="codecell" markdown="1">
 <div class="input_area" markdown="1">
 
-```
+```python
 1+1
 ```
 
@@ -37,6 +37,22 @@ Fill me in please! Don't forget code examples:
 
     2
 
+
+
+</div>
+
+</div>
+<div class="codecell" markdown="1">
+<div class="input_area" markdown="1">
+
+```python
+func()
+```
+
+</div>
+<div class="output_area" markdown="1">
+
+    this is a test
 
 
 </div>
