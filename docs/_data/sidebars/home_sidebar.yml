@@ -11,7 +11,7 @@ entries:
       url: /
     - output: web,pdf
       title: Title
-      url: /core
+      url: /templ
     output: web
     title: nbx
   output: web

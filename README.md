@@ -8,35 +8,116 @@
 
 -->
 
-# Project name here
+# `nbx.om`: Notebook Experiments for OpenMind
 
-> Summary description here.
+> This module enables you to quickly convert your jupyter notebook into a bundle of files that can be run on BCS'*OpenMind*. 
 
 
-This file will become your README and also the index of your documentation.
+# Getting started
 
-## Install
+## Prerequisites
+Install the package
 
-`pip install your_project_name`
+For the modules to work you have to set the environment variables `om`, `omx`, and `omsimg`:  
 
-## How to use
+- **om**: your login to *OpenMind*. 
+    - You need to enable logging into *OpenMind* using public key authentication. That means the command `ssh $om` should log you in whithout asking for a password. (googling for "ssh public key authentication" will provide you with a recipe like [this](https://kb.iu.edu/d/aews))
+- **omx**: path to the folder where *nbx* bundles are stored. This path will automatically be added to your python path. Any modules that are not part of your bundles `src/` folder or are included in your singularity container should go here.
+- **omsimg**: path to the folder containing your singularity images
 
-Fill me in please! Don't forget code examples:
+Mac users can adapt and copy the following lines to their `.bash_profile`
+
+```bash
+export om={your_user_name}@openmind7.mit.edu
+export omx=/om2/user/{your_user_name}/nbx-experiments
+export omsimg=/om2/user/{your_user_name}/simg
+```
+
+## Usage
+
+- Put your python scripts that you wrote for this experiment in a folder called `src`. The folder will be copied to the bundle so the scripts are available on *OpenMind* as well.
+- **#nbx**: Each cell that contains a `#nbx` tag in its **first** line will be considered part of the experiment.
+- **#xarg**: Putting `#xarg` above a variable declaration makes this variable *explicit*, it will become an argument of the experiment function. Any iterable to the right of the variable declaration, **separated by a semicolon**, will be considered the domain that will be swept during the parameter sweep.
+- Each nbx-experiment has to declare the variables `task_id` and `results_dir`. The *task id* will be set by the *wrapper* script and enumerates the configurations of the parameter space. The latter variable will also be set by the *wrapper* script, it will be replaced by the folder automatically created for a specific parameter configuration. 
+
+
+
+
+
+
+# Example
 <div class="codecell" markdown="1">
 <div class="input_area" markdown="1">
 
 ```python
-1+1
+%matplotlib inline
+%load_ext autoreload
+%autoreload 2
+```
+
+</div>
+
+</div>
+<div class="codecell" markdown="1">
+<div class="input_area" markdown="1">
+
+```python
+#nbx
+#xarg
+task_id = 0
+#xarg
+results_dir = "./"
+
+#xarg
+x=0;
+
+#xarg
+y=0; [0,1,2,3,4]
+
+z=0;
+```
+
+</div>
+
+</div>
+<div class="codecell" markdown="1">
+<div class="input_area" markdown="1">
+
+```python
+from nbx.om import NbxBundle
+
+bundle = NbxBundle(nbname="index.ipynb", 
+          name="test", 
+          linting=False,
+          time=[2,0], 
+          ntasks=4, 
+          step=5, 
+          simg="mirko-datascience.simg")
 ```
 
 </div>
 <div class="output_area" markdown="1">
 
-
-
-
-    2
-
+    
+    ** nbx bundle created **
+    Path:
+        test_nbx
+    
+    Source nb:
+        index.ipynb
+    
+    Parameters (#configs 5):
+        * y = [0,1,2,3,4]
+          task_id = 0
+          results_dir = "./"
+          x = 0
+    
+    Instructions:
+        Copy to remote, run the bash script, and pull the results
+        - `scp -r test_nbx $om:$omx`
+        - `ssh $om sbatch -D $omx/test_nbx $omx/test_nbx/run.sh`
+        - `scp -r $om:$omx/test_nbx/results ./results`
+    
 
 
 </div>
@@ -46,13 +127,32 @@ Fill me in please! Don't forget code examples:
 <div class="input_area" markdown="1">
 
 ```python
-func()
+!python test_nbx/experiment.py
 ```
 
 </div>
 <div class="output_area" markdown="1">
 
-    this is a test
+    Traceback (most recent call last):
+      File "test_nbx/experiment.py", line 6, in <module>
+        from nbx.pspace import ParameterSpace
+    ModuleNotFoundError: No module named 'nbx'
+
+
+</div>
+
+</div>
+<div class="codecell" markdown="1">
+<div class="input_area" markdown="1">
+
+```python
+!nbdev_build_docs
+```
+
+</div>
+<div class="output_area" markdown="1">
+
+    converting: /Users/mirko/Workspace/nbx-om/nbs/index.ipynb
 
 
 </div>
