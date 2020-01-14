@@ -13,7 +13,7 @@
 source /etc/profile.d/modules.sh
 module add openmind/singularity
 export SINGULARITY_CACHEDIR=/om2/user/`whoami`/.singularity
-singularity exec --nv -B /om:/om,/om2:/om2,/om2/user/mklukas/nbx-experiments:/omx /om2/user/mklukas/simg/mirko-datascience.simg \
+singularity exec --nv -B /om:/om,/om2:/om2,/om2/user/mklukas/nbx-experiments:/omx /om2/user/mklukas/simg/pytorch.simg \
                                 python wrapper.py \
                                 --job-id   $SLURM_ARRAY_JOB_ID \
                                 --task-id  $SLURM_ARRAY_TASK_ID \

@@ -80,14 +80,18 @@ def parse_src(a, src):
     if tag is None:
         if not is_magic_or_shell(src[0]):
             a['xbody'].append(src[0])
-
         rest = src[1:]
+
     elif tag == 'nbx':
         a['xbody'].append(src[0])
         rest = src[1:]
+
     elif tag == 'xarg':
         a['xarg'].append(src[1])
         rest = src[2:]
+
+    else:
+        rest = src[1:]
 
     return parse_src(a, rest)
 
@@ -165,7 +169,7 @@ class NbxBundle():
                  time=[1,0],
                  ntasks=10,
                  step=5,
-                 simg="mirko-datascience.simg"):
+                 simg="pytorch.simg"):
 
         if name is None:
             name = Path(nbname).stem
@@ -299,8 +303,7 @@ Parameters (#configs {{num_configs}}):
 
 Instructions:
     Copy to remote, run the bash script, and pull the results
-    - `scp -r {{path}} $om:$omx`
-    - `ssh $om sbatch -D $omx/{{path}} $omx/{{path}}/run.sh`
-    - `scp -r $om:$omx/{{path}}/results ./results`
-
+    - `bundle.push()` or `scp -r {{path}} $om:$omx`
+    - `bundle.run()` or `ssh $om sbatch -D $omx/{{path}} $omx/{{path}}/run.sh`
+    - `bundle.pull_results()` or `scp -r $om:$omx/{{path}}/results ./results`
 """

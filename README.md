@@ -8,7 +8,7 @@
 
 -->
 
-# `nbx.om`: Notebook Experiments for OpenMind
+# NBX: Notebook Experiments for OpenMind
 
 > This module enables you to quickly convert your jupyter notebook into a bundle of files that can be run on BCS'*OpenMind*. 
 
@@ -16,29 +16,33 @@
 # Getting started
 
 ## Prerequisites
-**1.** Install the package:
+#### Install the package:
 
 - `pip install nbx`
 
-**2.** Get a singulartiy that has the package installed. Here's one you can built yourself:
+#### Get a singulartiy image
+You'll need an image that has the package installed (there are ways around that, but I am keeping it simple at the moment). Here's the one I use most of the time:
 
-```shell
+```
 module load openmind/singularity/3.2.0
 export SINGULARITY_CACHEDIR="/om2/user/{your_user_name}/.singularity"
 singularity build pytorch.simg docker://mklukas/pytorch
 ```
 
-**3.** For the modules to work you have to set the environment variables `om`, `omx`, and `omsimg`:  
+#### Environment variables
+For the modules to work you have to set the environment variables `om`, `omx`, `omsimg`, and `omid`:  
 
 - **om**: your login to *OpenMind*. 
     - You need to enable logging into *OpenMind* using public key authentication. That means the command `ssh $om` should log you in whithout asking for a password. (googling for "ssh public key authentication" will provide you with a recipe like [this](https://kb.iu.edu/d/aews))
 - **omx**: path to the folder where *nbx* bundles are stored. This path will automatically be added to your python path. Any modules that are not part of your bundles `src/` folder or are included in your singularity container should go here.
 - **omsimg**: path to the folder containing your singularity images
+- **omid**: your Open Mind username 
 
-Mac users can adapt and copy the following lines to their `.bash_profile`
+Mac users can adapt and copy the following lines to their `.bash_profile` file
 
-```shell
+```
 export om={your_user_name}@openmind7.mit.edu
+export omid={your_user_name}
 export omx=/om2/user/{your_user_name}/nbx-experiments
 export omsimg=/om2/user/{your_user_name}/simg
 ```
@@ -51,11 +55,6 @@ export omsimg=/om2/user/{your_user_name}/simg
 - **#nbx**: Each cell that contains a `#nbx` tag in its **first** line will be considered part of the experiment.
 - **#xarg**: Putting `#xarg` above a variable declaration makes this variable *explicit*, it will become an argument of the experiment function. Any iterable to the right of the variable declaration, **separated by a semicolon**, will be considered the domain that will be swept during the parameter sweep.
 - Each nbx-experiment has to declare the variables `task_id` and `results_dir`. The *task id* will be set by the *wrapper* script and enumerates the configurations of the parameter space. The latter variable will also be set by the *wrapper* script, it will be replaced by the folder automatically created for a specific parameter configuration. 
-
-
-
-
-
 
 # Example
 <div class="codecell" markdown="1">
@@ -122,14 +121,14 @@ print("my results:", x, y, z)
 ```python
 from nbx.om import NbxBundle
 
-bundle = NbxBundle(nbname="index.ipynb", 
-          name="test", 
-          linting=False,
-          time=[2,0], 
-          ntasks=4, 
-          step=5, 
+bundle = NbxBundle(nbname="index.ipynb", # the name of the notebook
+          name="test",                   # name of the bundle
+          linting=False,                  
+          time=[2,0],                     
+          ntasks=4,                      
+          step=5,                        
           mail_user="mirko.klukas@gmail.com",
-          simg="mirko-datascience.simg")
+          simg="pytorch.simg")
 ```
 
 </div>
@@ -155,87 +154,9 @@ bundle = NbxBundle(nbname="index.ipynb",
     
     Instructions:
         Copy to remote, run the bash script, and pull the results
-        - `scp -r test_nbx $om:$omx`
-        - `ssh $om sbatch -D $omx/test_nbx $omx/test_nbx/run.sh`
-        - `scp -r $om:$omx/test_nbx/results ./results`
-    
-
-
-</div>
-
-</div>
-<div class="codecell" markdown="1">
-<div class="input_area" markdown="1">
-
-```python
-!python test_nbx/experiment.py
-```
-
-</div>
-<div class="output_area" markdown="1">
-
-    **nbx**
-    Running Experiment...
-    	kwargs: {}
-    	y: 0
-    	x: 0
-    	results_dir: ./
-    	task_id: 0
-    my results: 0 0 0
-    
-    **nbx**
-    Experiment finished.
-
-
-</div>
-
-</div>
-<div class="codecell" markdown="1">
-<div class="input_area" markdown="1">
-
-```python
-!scp -r test_nbx $om:$omx
-```
-
-</div>
-<div class="output_area" markdown="1">
-
-    wrapper.py                                    100%  950   106.0KB/s   00:00    
-    __init__.py                                   100%    0     0.0KB/s   00:00    
-    run.sh                                        100%  732   117.9KB/s   00:00    
-    experiment.py                                 100%  739    78.9KB/s   00:00    
-
-
-</div>
-
-</div>
-<div class="codecell" markdown="1">
-<div class="input_area" markdown="1">
-
-```python
-!ssh $om sbatch -D $omx/test_nbx $omx/test_nbx/run.sh
-```
-
-</div>
-<div class="output_area" markdown="1">
-
-    Submitted batch job 15969897
-
-
-</div>
-
-</div>
-<div class="codecell" markdown="1">
-<div class="input_area" markdown="1">
-
-```python
-!ssh $om squeue -u $omid
-```
-
-</div>
-<div class="output_area" markdown="1">
-
-                 JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+        - `bundle.push()` or `scp -r test_nbx $om:$omx`
+        - `bundle.run()` or `ssh $om sbatch -D $omx/test_nbx $omx/test_nbx/run.sh`
+        - `bundle.pull_results()` or `scp -r $om:$omx/test_nbx/results ./results`
 
 
 </div>
