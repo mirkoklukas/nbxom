@@ -6,7 +6,7 @@
 #SBATCH --array=1-5%5
 #SBATCH --mem-per-cpu 2000
 #SBATCH --mail-type=END
-#SBATCH --mail-user=mirko.klukas@gmail.com
+#SBATCH --mail-user=me@somewhere.com
 #SBATCH --out=io/out_%a
 #SBATCH --error=io/err_%a
 

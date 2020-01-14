@@ -127,7 +127,7 @@ bundle = NbxBundle(nbname="index.ipynb", # the name of the notebook
           time=[2,0],                     
           ntasks=4,                      
           step=5,                        
-          mail_user="mirko.klukas@gmail.com",
+          mail_user="me@somewhere.com",
           simg="pytorch.simg")
 ```
 
