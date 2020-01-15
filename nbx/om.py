@@ -5,6 +5,7 @@ __all__ = ['extract_tag', 'contains_tag', 'is_nbx', 'is_nbx_cell', 'is_magic_or_
            'get_items', 'not_constarg', 'parse_nb', 'check_parsed_nb', 'NbxBundle', 'BUNDLE_SUMMARY']
 
 #Cell
+#default_exp om
 import re
 _re_tag = re.compile(r"^\s*#([a-zA-Z_]+).*$")
 
@@ -135,12 +136,7 @@ def parse_nb(nb):
         xargs += [parse_xarg(line) for line in xa]
         xbody += xb
 
-
     pnb = Bunch()
-
-
-    print(xargs)
-
     pnb.func_body = xbody
     pnb.args = list(map(get_items(0,1), xargs))
     pnb.const_args = list(map(get_items(0,1), filter(is_constarg, xargs)))
@@ -152,6 +148,7 @@ def parse_nb(nb):
 #Cell
 from pathlib import Path
 import pkg_resources
+import importlib
 from .templ import *
 import os
 
@@ -185,14 +182,19 @@ class NbxBundle():
 
         check_parsed_nb(nb)
 
-        self.num_configs = 1
-        for k, vs in nb.sweep_args:
-            self.num_configs *= len(eval(vs))
+
 
         self.create_folders()
-        self.create_script("experiment.tpl", "experiment.py", vars(nb))
+        self.create_script("experiment.tpl", "experiment.py", vars(nb));
+
+        p = ".".join(str(self.path/'experiment').split("/"))
+        exp =  importlib.import_module(p)
+        len(exp.sweep_params)
+        self.num_configs = len(exp.sweep_params)
+
+
         self.create_script("wrapper.tpl", "wrapper.py", {
-            'experiment_module': "experiment"})
+            'experiment_module': "experiment"});
         self.create_script("run.tpl", "run.sh", {
             'job_name': name,
             'nbx_folder': os.environ['omx'],
@@ -208,7 +210,7 @@ class NbxBundle():
             'simg': Path(os.environ['omsimg'])/simg,
             'mail_user': mail_user,
             'mem_per_cpu': 2000
-        })
+        });
 
         print(self)
         if linting: self.check_scripts()
@@ -218,9 +220,10 @@ class NbxBundle():
         tpath = Path(pkg_resources.resource_filename(
                      __name__, f"/templates/{tname}"))
 
-        print(tpath)
         create_file_from_template(tpath,
             self.path/fname, vars)
+
+        return self.path/fname
 
 
     def create_folders(self):
@@ -284,7 +287,6 @@ class NbxBundle():
             raise "Check experiment script"
 
         print("(pylinting went ok)")
-
 
 
 BUNDLE_SUMMARY = """
