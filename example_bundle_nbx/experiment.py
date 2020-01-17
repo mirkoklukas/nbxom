@@ -7,7 +7,7 @@ from nbx.pspace import ParameterSpace
 
 
 sweep_params = ParameterSpace({
-	"x": [0,1,2,3,4],
+	"y": [0,1,2,3,4],
 })
 
 
@@ -17,7 +17,7 @@ def print_args(arg_dict):
 		print(f"\t{k}: {v}")
 
 
-def run_nb_experiment(x=0, y=0, task_id=0, results_dir="./", **kwargs):
+def run_nb_experiment(task_id=0, results_dir="./", x=0, y=0, **kwargs):
 	"""
 	This is an auto-generated function 
 	based on the jupyter notebook 
@@ -37,16 +37,10 @@ def run_nb_experiment(x=0, y=0, task_id=0, results_dir="./", **kwargs):
 
 	
 
-	
-
-	# some comment
-
-	z = 1
+	z=0;
 	#nbx
 
-	
-
-	print("some result")
+	print("my results:", x, y, z)
 
 
 	print("\n**nbx**\nExperiment finished.")
