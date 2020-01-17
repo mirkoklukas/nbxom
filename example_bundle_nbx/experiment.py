@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import fire
 import sys
 sys.path.append("/omx") #This path will be bound to the nbx folder in run.sh
 import numpy as np
@@ -46,5 +45,3 @@ def run_nb_experiment(task_id=0, results_dir="./", x=0, y=0, **kwargs):
 	print("\n**nbx**\nExperiment finished.")
 
 
-if __name__ == '__main__': 
-	fire.Fire(run_nb_experiment)
