@@ -302,7 +302,7 @@ class NbxBundle():
     def create_run_script(self, num, step, max_arr):
         path = self.path/'run.sh'
         with open(path, "w", newline="\n") as f:
-            f.write(r"#!/bin/sh\n\n")
+            f.write("#!/bin/sh\n\n")
             f.write(chain_jobs(get_arrays(num, max_arr), step))
 
     def create_script(self, tname, fname, vars):
