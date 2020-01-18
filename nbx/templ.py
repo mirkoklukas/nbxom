@@ -30,7 +30,7 @@ def render_templ(path, vars):
 def create_file_from_template(tpath, fpath, vars):
     script_src = render_templ(tpath, vars)
 
-    with open(fpath, "w") as f:
+    with open(fpath, "w", newline="\n") as f:
             f.write(script_src)
 
 def render_template_from_string(s, vars):
