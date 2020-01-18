@@ -230,7 +230,7 @@ def chain_jobs(arrays, step):
     return s
 
 #Cell
-from pathlib import Path
+from pathlib import PosixPath as Path
 import pkg_resources
 import importlib
 from .templ import *
