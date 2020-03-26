@@ -32,7 +32,7 @@ summary: "This module enables you to quickly convert your jupyter notebook into 
 <h2 id="Prerequisites">Prerequisites<a class="anchor-link" href="#Prerequisites">&#182;</a></h2><h4 id="Install-the-package:">Install the package:<a class="anchor-link" href="#Install-the-package:">&#182;</a></h4><ul>
 <li><code>pip install nbx</code></li>
 </ul>
-<h4 id="Get-a-singulartiy-image">Get a singulartiy image<a class="anchor-link" href="#Get-a-singulartiy-image">&#182;</a></h4><p>You'll need an image that has the package installed (there are ways around that, but I am keeping it simple at the moment). Here's the one I use most of the time:</p>
+<h4 id="Get-a-singulartiy-image">Get a singulartiy image<a class="anchor-link" href="#Get-a-singulartiy-image">&#182;</a></h4><p>You'll need an image that has the package installed (there are ways around that, but I am keeping it simple at the moment). Here's how you can build an image:</p>
 
 <pre><code>module load openmind/singularity/3.2.0
 export SINGULARITY_CACHEDIR="/om2/user/{your_user_name}/.singularity"
@@ -43,7 +43,7 @@ singularity build pytorch.simg docker://mklukas/pytorch</code></pre>
 <li>You need to enable logging into <em>OpenMind</em> using public key authentication. That means the command <code>ssh $om</code> should log you in whithout asking for a password. (googling for "ssh public key authentication" will provide you with a recipe like <a href="https://kb.iu.edu/d/aews">this</a>)</li>
 </ul>
 </li>
-<li><strong>omx</strong>: path to the folder where <em>nbx</em> bundles are stored. This path will automatically be added to your python path. Any modules that are not part of your bundles <code>src/</code> folder or are included in your singularity container should go here.</li>
+<li><strong>omx</strong>: path to the folder where <em>nbx</em> bundles are stored. This path will automatically be added to your python path. Any modules that are not part of your bundle's <code>src/</code> folder or are included in your singularity container should go here.</li>
 <li><strong>omsimg</strong>: path to the folder containing your singularity images</li>
 <li><strong>omid</strong>: your Open Mind username </li>
 </ul>
@@ -75,35 +75,16 @@ export omsimg=/om2/user/{your_user_name}/simg</code></pre>
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
-<span class="o">%</span><span class="k">load_ext</span> autoreload
-<span class="o">%</span><span class="k">autoreload</span> 2
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>The autoreload extension is already loaded. To reload it, use:
-  %reload_ext autoreload
-</pre>
-</div>
-</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Experiment">Experiment<a class="anchor-link" href="#Experiment">&#182;</a></h2><p>In every experiment we need to indicate which cells are part of it (using the <code>#nbx</code> flag), and need to specify these two arguments:</p>
+<ul>
+<li><code>task_id</code></li>
+<li><code>results_dir</code></li>
+</ul>
 
 </div>
 </div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -114,13 +95,32 @@ export omsimg=/om2/user/{your_user_name}/simg</code></pre>
 <span class="c1">#xarg</span>
 <span class="n">task_id</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="c1">#xarg</span>
-<span class="n">results_dir</span> <span class="o">=</span> <span class="s2">&quot;./&quot;</span>
+<span class="n">results_dir</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This cell will be part of the experiment</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#nbx</span>
+<span class="c1">#xarg</span>
+<span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
 
 <span class="c1">#xarg</span>
-<span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
-
-<span class="c1">#xarg</span>
-<span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span>
+<span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span>
 
 <span class="n">z</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
 </pre></div>
@@ -129,6 +129,13 @@ export omsimg=/om2/user/{your_user_name}/simg</code></pre>
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This cell will also be part of the experiment. The output will be written to a log file in the <code>io</code> folder that will automatically be created.</p>
+
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -143,13 +150,93 @@ export omsimg=/om2/user/{your_user_name}/simg</code></pre>
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Note how we used the variable <code>results_dir</code>. It will will be replaced by <code>"results/task_id/"</code>; a corresponding folder will automatically be created. It is really just a hook so we can manipulate it behind the scenes.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{results_dir}</span><span class="s2">/your_file.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;I will be written to: example_nbx_bundle/results/task_id/your_file.txt&quot;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{task_id}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;./your_file.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;I will be written to: example_nbx_bundle/your_file.txt&quot;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;If I don&#39;t add `results_dir` I will be overwritten: </span><span class="se">\n</span><span class="si">{task_id}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Creating-and-running-an-NBX-bundle">Creating and running an NBX bundle<a class="anchor-link" href="#Creating-and-running-an-NBX-bundle">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To run the experiment on OM we have to create a bundle that we can interact with...</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">nbx.om</span> <span class="k">import</span> <span class="n">NbxBundle</span>
+
+<span class="n">bundle</span> <span class="o">=</span> <span class="n">NbxBundle</span><span class="p">(</span><span class="n">nbname</span><span class="o">=</span><span class="s2">&quot;index.ipynb&quot;</span><span class="p">,</span> <span class="c1"># the name of the notebook to use as exp</span>
+          <span class="n">name</span><span class="o">=</span><span class="s2">&quot;example_bundle&quot;</span><span class="p">,</span>         <span class="c1"># name of the bundle</span>
+          <span class="n">linting</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>                 <span class="c1"># enable basic linting</span>
+          <span class="n">time</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">],</span>                    <span class="c1"># comp time [hours, minutes]</span>
+          <span class="n">ntasks</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>                      <span class="c1"># requested comp nodes</span>
+          <span class="n">step</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>                        <span class="c1"># parallel jobs (compare bundle/run.sh)</span>
+          <span class="n">max_arr</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>                     <span class="c1"># maximum number of queued jobs on OM is 1000</span>
+          <span class="n">mail_user</span><span class="o">=</span><span class="s2">&quot;me@somewhere.com&quot;</span><span class="p">,</span>  <span class="c1"># notification email</span>
+          <span class="n">simg</span><span class="o">=</span><span class="s2">&quot;pytorch.simg&quot;</span><span class="p">)</span>           <span class="c1"># singulrity img on OM in $omsimg</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
 <div class="output_wrapper">
 <div class="output">
 
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>my results: 0 0 0
+<pre>
+** nbx bundle created **
+Path:
+    example_bundle_nbx
+
+Source nb:
+    index.ipynb
+
+Parameters (#configs 8):
+    * x = [0,1]
+    * y = [0,1,2,4]
+      task_id = 0
+      results_dir = &#34;.&#34;
+
+Instructions:
+    Copy to remote, run the bash script, and pull the results
+    - `bundle.push()` or `scp -r example_bundle_nbx $om:$omx`
+    - `bundle.run()` or `ssh $om sbatch -D $omx/example_bundle_nbx $omx/example_bundle_nbx/run.sh`
+    - `bundle.pull_results()` or `scp -r $om:$omx/example_bundle_nbx/results ./results`
 </pre>
 </div>
 </div>
@@ -163,16 +250,20 @@ export omsimg=/om2/user/{your_user_name}/simg</code></pre>
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">nbx.om</span> <span class="k">import</span> <span class="n">NbxBundle</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">bundle</span><span class="o">.</span><span class="n">push</span><span class="p">()</span>
+</pre></div>
 
-<span class="n">bundle</span> <span class="o">=</span> <span class="n">NbxBundle</span><span class="p">(</span><span class="n">nbname</span><span class="o">=</span><span class="s2">&quot;index.ipynb&quot;</span><span class="p">,</span> <span class="c1"># the name of the notebook</span>
-          <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">,</span>                   <span class="c1"># name of the bundle</span>
-          <span class="n">linting</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>                  
-          <span class="n">time</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>                     
-          <span class="n">ntasks</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>                      
-          <span class="n">step</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>                        
-          <span class="n">mail_user</span><span class="o">=</span><span class="s2">&quot;me@somewhere.com&quot;</span><span class="p">,</span>
-          <span class="n">simg</span><span class="o">=</span><span class="s2">&quot;pytorch.simg&quot;</span><span class="p">)</span>
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">bundle</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 </pre></div>
 
     </div>
@@ -185,33 +276,72 @@ export omsimg=/om2/user/{your_user_name}/simg</code></pre>
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>[(&#39;task_id&#39;, &#39;0&#39;, &#39;&#39;), (&#39;results_dir&#39;, &#39;&#34;./&#34;&#39;, &#39;&#39;), (&#39;x&#39;, &#39;0&#39;, &#39;&#39;), (&#39;y&#39;, &#39;0&#39;, &#39;[0,1,2,3,4]&#39;)]
-/Users/mirko/Workspace/nbx/nbx/templates/experiment.tpl
-/Users/mirko/Workspace/nbx/nbx/templates/wrapper.tpl
-/Users/mirko/Workspace/nbx/nbx/templates/run.tpl
-
-** nbx bundle created **
-Path:
-    test_nbx
-
-Source nb:
-    index.ipynb
-
-Parameters (#configs 5):
-    * y = [0,1,2,3,4]
-      task_id = 0
-      results_dir = &#34;./&#34;
-      x = 0
-
-Instructions:
-    Copy to remote, run the bash script, and pull the results
-    - `bundle.push()` or `scp -r test_nbx $om:$omx`
-    - `bundle.run()` or `ssh $om sbatch -D $omx/test_nbx $omx/test_nbx/run.sh`
-    - `bundle.pull_results()` or `scp -r $om:$omx/test_nbx/results ./results`
+<pre>Submitted batch job 16442489
 </pre>
 </div>
 </div>
 
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">bundle</span><span class="o">.</span><span class="n">status</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+        16441183_1    normal example_  mklukas  R       0:01      1 node016
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">bundle</span><span class="o">.</span><span class="n">pull_results</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The results are now in the local folder:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>ls example_bundle_nbx
+</pre></div>
+
+    </div>
 </div>
 </div>
 

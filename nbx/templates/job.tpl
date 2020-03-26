@@ -3,7 +3,7 @@
 #SBATCH --job-name={{job_name}}
 #SBATCH -t {{hours}}:{{mins}}:00
 #SBATCH --ntasks={{ntasks}}
-#SBATCH --mem-per-cpu {{mem_per_cpu}}
+#SBATCH --mem-per-cpu={{mem_per_cpu}}
 #SBATCH --mail-type=END
 #SBATCH --mail-user={{mail_user}}
 #SBATCH --out=io/out_%a

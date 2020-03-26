@@ -223,10 +223,11 @@ def cont_job(j, start, end, step):
 def chain_jobs(arrays, step):
     s = ""
     for i, arr in enumerate(arrays):
+        s += f"echo \"Running jobs {arr[0]} - {arr[1]} ... \"\n"
         if i ==0: s += init_job(arr[0], arr[1], step)
         else: s += cont_job(i, arr[0], arr[1], step)
         s += "\n"
-
+    s += "echo \"done.\""
     return s
 
 #Cell
@@ -240,6 +241,7 @@ def check_parsed_nb(pnb):
     keys = list(map(get_item(0), pnb.args))
     if "task_id" not in keys: raise KeyError("You didn't specify `task_id`!!")
     if "results_dir" not in keys: raise KeyError("You didn't specify `results_dir`!!")
+
 
 class NbxBundle():
     def __init__(self,
@@ -303,6 +305,8 @@ class NbxBundle():
         path = self.path/'run.sh'
         with open(path, "w", newline="\n") as f:
             f.write("#!/bin/sh\n\n")
+            f.write("#SBATCH --out=io/runner_out__%A\n")
+            f.write("#SBATCH --error=io/runner_err__%A\n\n")
             f.write(chain_jobs(get_arrays(num, max_arr), step))
 
     def create_script(self, tname, fname, vars):

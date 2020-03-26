@@ -1,9 +1,9 @@
 #!/bin/sh
 
 #SBATCH --job-name=example_bundle
-#SBATCH -t 2:0:00
+#SBATCH -t 0:20:00
 #SBATCH --ntasks=4
-#SBATCH --mem-per-cpu 2000
+#SBATCH --mem-per-cpu=2000
 #SBATCH --mail-type=END
 #SBATCH --mail-user=me@somewhere.com
 #SBATCH --out=io/out_%a

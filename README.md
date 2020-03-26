@@ -21,7 +21,7 @@
 - `pip install nbx`
 
 #### Get a singulartiy image
-You'll need an image that has the package installed (there are ways around that, but I am keeping it simple at the moment). Here's the one I use most of the time:
+You'll need an image that has the package installed (there are ways around that, but I am keeping it simple at the moment). Here's how you can build an image:
 
 ```
 module load openmind/singularity/3.2.0
@@ -34,7 +34,7 @@ For the modules to work you have to set the environment variables `om`, `omx`, `
 
 - **om**: your login to *OpenMind*. 
     - You need to enable logging into *OpenMind* using public key authentication. That means the command `ssh $om` should log you in whithout asking for a password. (googling for "ssh public key authentication" will provide you with a recipe like [this](https://kb.iu.edu/d/aews))
-- **omx**: path to the folder where *nbx* bundles are stored. This path will automatically be added to your python path. Any modules that are not part of your bundles `src/` folder or are included in your singularity container should go here.
+- **omx**: path to the folder where *nbx* bundles are stored. This path will automatically be added to your python path. Any modules that are not part of your bundle's `src/` folder or are included in your singularity container should go here.
 - **omsimg**: path to the folder containing your singularity images
 - **omid**: your Open Mind username 
 
@@ -57,25 +57,12 @@ export omsimg=/om2/user/{your_user_name}/simg
 - Each nbx-experiment has to declare the variables `task_id` and `results_dir`. The *task id* will be set by the *wrapper* script and enumerates the configurations of the parameter space. The latter variable will also be set by the *wrapper* script, it will be replaced by the folder automatically created for a specific parameter configuration. 
 
 # Example
-<div class="codecell" markdown="1">
-<div class="input_area" markdown="1">
 
-```python
-%matplotlib inline
-%load_ext autoreload
-%autoreload 2
-```
+## Experiment
 
-</div>
-<div class="output_area" markdown="1">
-
-    The autoreload extension is already loaded. To reload it, use:
-      %reload_ext autoreload
-
-
-</div>
-
-</div>
+In every experiment we need to indicate which cells are part of it (using the `#nbx` flag), and need to specify these two arguments:
+- `task_id`
+- `results_dir`
 <div class="codecell" markdown="1">
 <div class="input_area" markdown="1">
 
@@ -84,13 +71,24 @@ export omsimg=/om2/user/{your_user_name}/simg
 #xarg
 task_id = 0
 #xarg
-results_dir = "./"
+results_dir = "."
+```
+
+</div>
+
+</div>
+
+This cell will be part of the experiment
+<div class="codecell" markdown="1">
+<div class="input_area" markdown="1">
+
+```python
+#nbx
+#xarg
+x=0; [0,1]
 
 #xarg
-x=0;
-
-#xarg
-y=0; [0,1,2,3,4]
+y=0; [0,1,2,4]
 
 z=0;
 ```
@@ -98,6 +96,8 @@ z=0;
 </div>
 
 </div>
+
+This cell will also be part of the experiment. The output will be written to a log file in the `io` folder that will automatically be created. 
 <div class="codecell" markdown="1">
 <div class="input_area" markdown="1">
 
@@ -107,9 +107,69 @@ print("my results:", x, y, z)
 ```
 
 </div>
+
+</div>
+
+Note how we used the variable `results_dir`. It will will be replaced by `"results/task_id/"`; a corresponding folder will automatically be created. It is really just a hook so we can manipulate it behind the scenes.
+<div class="codecell" markdown="1">
+<div class="input_area" markdown="1">
+
+```python
+with open(f"{results_dir}/your_file.txt", "w") as f:
+    f.write("I will be written to: example_nbx_bundle/results/task_id/your_file.txt")
+    f.write(f"\n{task_id}")
+    
+with open(f"./your_file.txt", "w") as f:
+    f.write("I will be written to: example_nbx_bundle/your_file.txt")
+    f.write(f"If I don't add `results_dir` I will be overwritten: \n{task_id}")
+```
+
+</div>
+
+</div>
+
+## Creating and running an NBX bundle
+
+To run the experiment on OM we have to create a bundle that we can interact with...
+<div class="codecell" markdown="1">
+<div class="input_area" markdown="1">
+
+```python
+from nbx.om import NbxBundle
+
+bundle = NbxBundle(nbname="index.ipynb", # the name of the notebook to use as exp
+          name="example_bundle",         # name of the bundle
+          linting=False,                 # enable basic linting
+          time=[0,20],                    # comp time [hours, minutes]
+          ntasks=4,                      # requested comp nodes
+          step=2,                        # parallel jobs (compare bundle/run.sh)
+          max_arr=4,                     # maximum number of queued jobs on OM is 1000
+          mail_user="me@somewhere.com",  # notification email
+          simg="pytorch.simg")           # singulrity img on OM in $omsimg
+```
+
+</div>
 <div class="output_area" markdown="1">
 
-    my results: 0 0 0
+    
+    ** nbx bundle created **
+    Path:
+        example_bundle_nbx
+    
+    Source nb:
+        index.ipynb
+    
+    Parameters (#configs 8):
+        * x = [0,1]
+        * y = [0,1,2,4]
+          task_id = 0
+          results_dir = "."
+    
+    Instructions:
+        Copy to remote, run the bash script, and pull the results
+        - `bundle.push()` or `scp -r example_bundle_nbx $om:$omx`
+        - `bundle.run()` or `ssh $om sbatch -D $omx/example_bundle_nbx $omx/example_bundle_nbx/run.sh`
+        - `bundle.pull_results()` or `scp -r $om:$omx/example_bundle_nbx/results ./results`
 
 
 </div>
@@ -119,45 +179,63 @@ print("my results:", x, y, z)
 <div class="input_area" markdown="1">
 
 ```python
-from nbx.om import NbxBundle
+bundle.push()
+```
 
-bundle = NbxBundle(nbname="index.ipynb", # the name of the notebook
-          name="test",                   # name of the bundle
-          linting=False,                  
-          time=[2,0],                     
-          ntasks=4,                      
-          step=5,                        
-          mail_user="me@somewhere.com",
-          simg="pytorch.simg")
+</div>
+
+</div>
+<div class="codecell" markdown="1">
+<div class="input_area" markdown="1">
+
+```python
+bundle.run()
 ```
 
 </div>
 <div class="output_area" markdown="1">
 
-    [('task_id', '0', ''), ('results_dir', '"./"', ''), ('x', '0', ''), ('y', '0', '[0,1,2,3,4]')]
-    /Users/mirko/Workspace/nbx/nbx/templates/experiment.tpl
-    /Users/mirko/Workspace/nbx/nbx/templates/wrapper.tpl
-    /Users/mirko/Workspace/nbx/nbx/templates/run.tpl
-    
-    ** nbx bundle created **
-    Path:
-        test_nbx
-    
-    Source nb:
-        index.ipynb
-    
-    Parameters (#configs 5):
-        * y = [0,1,2,3,4]
-          task_id = 0
-          results_dir = "./"
-          x = 0
-    
-    Instructions:
-        Copy to remote, run the bash script, and pull the results
-        - `bundle.push()` or `scp -r test_nbx $om:$omx`
-        - `bundle.run()` or `ssh $om sbatch -D $omx/test_nbx $omx/test_nbx/run.sh`
-        - `bundle.pull_results()` or `scp -r $om:$omx/test_nbx/results ./results`
+    Submitted batch job 16442489
 
+
+</div>
+
+</div>
+<div class="codecell" markdown="1">
+<div class="input_area" markdown="1">
+
+```python
+bundle.status()
+```
+
+</div>
+<div class="output_area" markdown="1">
+
+    JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+            16441183_1    normal example_  mklukas  R       0:01      1 node016
+
+
+</div>
+
+</div>
+<div class="codecell" markdown="1">
+<div class="input_area" markdown="1">
+
+```python
+bundle.pull_results()
+```
+
+</div>
+
+</div>
+
+The results are now in the local folder:
+<div class="codecell" markdown="1">
+<div class="input_area" markdown="1">
+
+```python
+!ls example_bundle_nbx
+```
 
 </div>
 
