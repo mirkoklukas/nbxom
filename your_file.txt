@@ -1,0 +1,2 @@
+I will be written to: example_nbx_bundle/results/task_id/your_file.txt
+0

@@ -223,11 +223,9 @@ def cont_job(j, start, end, step):
 def chain_jobs(arrays, step):
     s = ""
     for i, arr in enumerate(arrays):
-        s += f"echo \"Running jobs {arr[0]} - {arr[1]} ... \"\n"
         if i ==0: s += init_job(arr[0], arr[1], step)
         else: s += cont_job(i, arr[0], arr[1], step)
         s += "\n"
-    s += "echo \"done.\""
     return s
 
 #Cell
@@ -253,7 +251,7 @@ class NbxBundle():
                  ntasks=10,
                  step=5,
                  simg="pytorch.simg",
-                 max_arr=1000,
+                 max_arr=900,
                  mem_per_cpu=2000):
 
         if name is None:

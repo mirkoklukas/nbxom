@@ -9,6 +9,7 @@
 #SBATCH --mail-user={{mail_user}}
 #SBATCH --out=io/out_%a
 #SBATCH --error=io/err_%a
+#SBATCH --exclude=node030,node016
 
 source /etc/profile.d/modules.sh
 module add openmind/singularity

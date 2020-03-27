@@ -8,11 +8,13 @@
 #SBATCH --mail-user={{mail_user}}
 #SBATCH --out=io/out_%a
 #SBATCH --error=io/err_%a
+#SBATCH --exclude=node030,node016
 
 source /etc/profile.d/modules.sh
 module add openmind/singularity
 export SINGULARITY_CACHEDIR=/om2/user/`whoami`/.singularity
-singularity exec --nv -B /om:/om,/om2:/om2,{{nbx_folder}}:/omx {{simg}} \
+singularity exec -B /om:/om,/om2:/om2,{{nbx_folder}}:/omx \
+                                {{simg}} \
                                 python {{script}} \
                                 --job-id   $SLURM_ARRAY_JOB_ID \
                                 --task-id  $SLURM_ARRAY_TASK_ID \

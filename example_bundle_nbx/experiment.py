@@ -6,7 +6,7 @@ from nbx.pspace import ParameterSpace
 
 
 sweep_params = ParameterSpace({
-	"x": [0,1],
+	"x": range(10),
 	"y": [0,1,2,4],
 })
 
@@ -37,10 +37,23 @@ def run_nb_experiment(task_id=0, results_dir=".", x=0, y=0, **kwargs):
 
 	
 
+	
+
 	z=0;
+
+	
+
+	# ...
 	#nbx
 
 	print("my results:", x, y, z)
+	#nbx
+
+	with open(f"{results_dir}/your_file.txt", "w") as f:
+
+	    f.write("I will be written to: example_nbx_bundle/results/task_id/your_file.txt")
+
+	    f.write(f"\n{task_id}")
 
 
 	print("\n**nbx**\nExperiment finished.")
