@@ -2,13 +2,13 @@
 import sys
 sys.path.append("/omx") #This path will be bound to the nbx folder in run.sh
 import numpy as np
-from nbx.pspace import ParameterSpace
+from nbx.pspace import ParameterSpace, Axis
 
 
-sweep_params = ParameterSpace({
-	"x": range(10),
-	"y": [0,1,2,4],
-})
+sweep_params = ParameterSpace([
+	Axis("x", range(5)),
+	Axis("y", [0,1,2,4]),
+])
 
 
 def print_args(arg_dict):

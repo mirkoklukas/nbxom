@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #SBATCH --job-name={{job_name}}
-#SBATCH -t {{hours}}:{{mins}}:00
+#SBATCH --time={{hours}}:{{mins}}:00
 #SBATCH --ntasks={{ntasks}}
 #SBATCH --mem-per-cpu={{mem_per_cpu}}
 #SBATCH --mail-type=END
@@ -12,8 +12,8 @@
 
 source /etc/profile.d/modules.sh
 module add openmind/singularity
-export SINGULARITY_CACHEDIR=/om2/user/`whoami`/.singularity
-singularity exec -B /om:/om,/om2:/om2,{{nbx_folder}}:/omx \
+export SINGULARITY_CACHEDIR=/om5/user/`whoami`/.singularity
+singularity exec -B /om:/om,/om5:/om5,/om2:/om2, {{nbx_folder}}:/omx \
                                 {{simg}} \
                                 python {{script}} \
                                 --job-id   $SLURM_ARRAY_JOB_ID \

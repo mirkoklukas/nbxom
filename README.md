@@ -67,6 +67,18 @@ In every experiment we need to indicate which cells are part of it (using the `#
 <div class="input_area" markdown="1">
 
 ```python
+%matplotlib inline
+%load_ext autoreload
+%autoreload 2
+```
+
+</div>
+
+</div>
+<div class="codecell" markdown="1">
+<div class="input_area" markdown="1">
+
+```python
 #nbx
 #xarg
 task_id = 0
@@ -84,13 +96,16 @@ This cell will be part of the experiment
 
 ```python
 #nbx
+
 #xarg
-x=0; [0,1]
+x=0; range(5)
 
 #xarg
 y=0; [0,1,2,4]
 
 z=0;
+
+# ...
 ```
 
 </div>
@@ -107,6 +122,12 @@ print("my results:", x, y, z)
 ```
 
 </div>
+<div class="output_area" markdown="1">
+
+    my results: 0 0 0
+
+
+</div>
 
 </div>
 
@@ -115,13 +136,10 @@ Note how we used the variable `results_dir`. It will will be replaced by `"resul
 <div class="input_area" markdown="1">
 
 ```python
+#nbx
 with open(f"{results_dir}/your_file.txt", "w") as f:
     f.write("I will be written to: example_nbx_bundle/results/task_id/your_file.txt")
     f.write(f"\n{task_id}")
-    
-with open(f"./your_file.txt", "w") as f:
-    f.write("I will be written to: example_nbx_bundle/your_file.txt")
-    f.write(f"If I don't add `results_dir` I will be overwritten: \n{task_id}")
 ```
 
 </div>
@@ -140,10 +158,10 @@ from nbx.om import NbxBundle
 bundle = NbxBundle(nbname="index.ipynb", # the name of the notebook to use as exp
           name="example_bundle",         # name of the bundle
           linting=False,                 # enable basic linting
-          time=[0,20],                    # comp time [hours, minutes]
+          time=[0,20],                   # comp time [hours, minutes]
           ntasks=4,                      # requested comp nodes
-          step=2,                        # parallel jobs (compare bundle/run.sh)
-          max_arr=4,                     # maximum number of queued jobs on OM is 1000
+          step=50,                       # parallel jobs (compare bundle/run.sh)
+          max_arr=10,                    # maximum number of queued jobs on OM is 1000
           mail_user="me@somewhere.com",  # notification email
           simg="pytorch.simg")           # singulrity img on OM in $omsimg
 ```
@@ -159,8 +177,8 @@ bundle = NbxBundle(nbname="index.ipynb", # the name of the notebook to use as ex
     Source nb:
         index.ipynb
     
-    Parameters (#configs 8):
-        * x = [0,1]
+    Parameters (#configs 20):
+        * x = range(5)
         * y = [0,1,2,4]
           task_id = 0
           results_dir = "."
@@ -170,6 +188,47 @@ bundle = NbxBundle(nbname="index.ipynb", # the name of the notebook to use as ex
         - `bundle.push()` or `scp -r example_bundle_nbx $om:$omx`
         - `bundle.run()` or `ssh $om sbatch -D $omx/example_bundle_nbx $omx/example_bundle_nbx/run.sh`
         - `bundle.pull_results()` or `scp -r $om:$omx/example_bundle_nbx/results ./results`
+
+
+</div>
+
+</div>
+<div class="codecell" markdown="1">
+<div class="input_area" markdown="1">
+
+```python
+!ls example_bundle_nbx/
+```
+
+</div>
+<div class="output_area" markdown="1">
+
+    __init__.py   experiment.py job.sh        wrapper.py
+    [34m__pycache__[m[m   [34mio[m[m            run.sh
+
+
+</div>
+
+</div>
+<div class="codecell" markdown="1">
+<div class="input_area" markdown="1">
+
+```python
+from example_bundle_nbx.experiment import sweep_params as sweep
+
+print(len(sweep))
+print(sweep[0])
+print(sweep[1])
+print(sweep[4])
+```
+
+</div>
+<div class="output_area" markdown="1">
+
+    12
+    {'x': 0, 'y': 0}
+    {'x': 0, 'y': 1}
+    {'x': 1, 'y': 0}
 
 
 </div>
@@ -193,12 +252,6 @@ bundle.run()
 ```
 
 </div>
-<div class="output_area" markdown="1">
-
-    Submitted batch job 16442489
-
-
-</div>
 
 </div>
 <div class="codecell" markdown="1">
@@ -207,13 +260,6 @@ bundle.run()
 ```python
 bundle.status()
 ```
-
-</div>
-<div class="output_area" markdown="1">
-
-    JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
-            16441183_1    normal example_  mklukas  R       0:01      1 node016
-
 
 </div>
 

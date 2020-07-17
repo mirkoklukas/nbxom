@@ -91,6 +91,21 @@ export omsimg=/om2/user/{your_user_name}/simg</code></pre>
 
 <div class="inner_cell">
     <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#nbx</span>
 <span class="c1">#xarg</span>
 <span class="n">task_id</span> <span class="o">=</span> <span class="mi">0</span>
@@ -116,13 +131,16 @@ export omsimg=/om2/user/{your_user_name}/simg</code></pre>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#nbx</span>
+
 <span class="c1">#xarg</span>
-<span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
 
 <span class="c1">#xarg</span>
 <span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span>
 
 <span class="n">z</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="c1"># ...</span>
 </pre></div>
 
     </div>
@@ -150,6 +168,20 @@ export omsimg=/om2/user/{your_user_name}/simg</code></pre>
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>my results: 0 0 0
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -163,13 +195,10 @@ export omsimg=/om2/user/{your_user_name}/simg</code></pre>
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{results_dir}</span><span class="s2">/your_file.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#nbx</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{results_dir}</span><span class="s2">/your_file.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;I will be written to: example_nbx_bundle/results/task_id/your_file.txt&quot;</span><span class="p">)</span>
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{task_id}</span><span class="s2">&quot;</span><span class="p">)</span>
-    
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;./your_file.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;I will be written to: example_nbx_bundle/your_file.txt&quot;</span><span class="p">)</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;If I don&#39;t add `results_dir` I will be overwritten: </span><span class="se">\n</span><span class="si">{task_id}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -200,10 +229,10 @@ export omsimg=/om2/user/{your_user_name}/simg</code></pre>
 <span class="n">bundle</span> <span class="o">=</span> <span class="n">NbxBundle</span><span class="p">(</span><span class="n">nbname</span><span class="o">=</span><span class="s2">&quot;index.ipynb&quot;</span><span class="p">,</span> <span class="c1"># the name of the notebook to use as exp</span>
           <span class="n">name</span><span class="o">=</span><span class="s2">&quot;example_bundle&quot;</span><span class="p">,</span>         <span class="c1"># name of the bundle</span>
           <span class="n">linting</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>                 <span class="c1"># enable basic linting</span>
-          <span class="n">time</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">],</span>                    <span class="c1"># comp time [hours, minutes]</span>
+          <span class="n">time</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">],</span>                   <span class="c1"># comp time [hours, minutes]</span>
           <span class="n">ntasks</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>                      <span class="c1"># requested comp nodes</span>
-          <span class="n">step</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>                        <span class="c1"># parallel jobs (compare bundle/run.sh)</span>
-          <span class="n">max_arr</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>                     <span class="c1"># maximum number of queued jobs on OM is 1000</span>
+          <span class="n">step</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>                       <span class="c1"># parallel jobs (compare bundle/run.sh)</span>
+          <span class="n">max_arr</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>                    <span class="c1"># maximum number of queued jobs on OM is 1000</span>
           <span class="n">mail_user</span><span class="o">=</span><span class="s2">&quot;me@somewhere.com&quot;</span><span class="p">,</span>  <span class="c1"># notification email</span>
           <span class="n">simg</span><span class="o">=</span><span class="s2">&quot;pytorch.simg&quot;</span><span class="p">)</span>           <span class="c1"># singulrity img on OM in $omsimg</span>
 </pre></div>
@@ -226,8 +255,8 @@ Path:
 Source nb:
     index.ipynb
 
-Parameters (#configs 8):
-    * x = [0,1]
+Parameters (#configs 20):
+    * x = range(5)
     * y = [0,1,2,4]
       task_id = 0
       results_dir = &#34;.&#34;
@@ -237,6 +266,69 @@ Instructions:
     - `bundle.push()` or `scp -r example_bundle_nbx $om:$omx`
     - `bundle.run()` or `ssh $om sbatch -D $omx/example_bundle_nbx $omx/example_bundle_nbx/run.sh`
     - `bundle.pull_results()` or `scp -r $om:$omx/example_bundle_nbx/results ./results`
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>ls example_bundle_nbx/
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>__init__.py   experiment.py job.sh        wrapper.py
+<span class="ansi-blue-fg">__pycache__</span>   <span class="ansi-blue-fg">io</span>            run.sh
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">example_bundle_nbx.experiment</span> <span class="k">import</span> <span class="n">sweep_params</span> <span class="k">as</span> <span class="n">sweep</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sweep</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">sweep</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">sweep</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">sweep</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>12
+{&#39;x&#39;: 0, &#39;y&#39;: 0}
+{&#39;x&#39;: 0, &#39;y&#39;: 1}
+{&#39;x&#39;: 1, &#39;y&#39;: 0}
 </pre>
 </div>
 </div>
@@ -270,20 +362,6 @@ Instructions:
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Submitted batch job 16442489
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -294,21 +372,6 @@ Instructions:
 </pre></div>
 
     </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
-        16441183_1    normal example_  mklukas  R       0:01      1 node016
-</pre>
-</div>
-</div>
-
 </div>
 </div>
 
