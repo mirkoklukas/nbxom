@@ -11,15 +11,6 @@ parser = argparse.ArgumentParser(description='Wraps an experiment...')
 parser.add_argument('--job-id', dest="job_id", default=0, type=int)
 parser.add_argument('--task-id', dest="task_id", default=0, type=int)
 parser.add_argument('--results-dir', dest="results_dir", default=Path(__file__).parent/'results', type=str)
-args = parser.parse_args()
-
-
-j  = args.job_id
-t  = args.task_id
-rd = Path(args.results_dir)/f"{t}"
-
-os.makedirs(rd, exist_ok=True)
-
 
 sweep_params = ParameterSpace([
 	Axis("x", range(5)),
@@ -37,7 +28,7 @@ def run(task_id=0, results_dir=".", x=0, y=0):
 	This is an auto-generated function 
 	based on the jupyter notebook 
 
-	> Example_Python.ipynb
+	> OM2 Example - Python.ipynb
 	
 	Don't judge, it might look ugly.
 	"""
@@ -64,5 +55,12 @@ def run(task_id=0, results_dir=".", x=0, y=0):
 
 
 if __name__ == '__main__':
+	args = parser.parse_args()
+	j  = args.job_id
+	t  = args.task_id
+	rd = Path(args.results_dir)/f"{t}"
+
+	os.makedirs(rd, exist_ok=True)
+
 	xargs = sweep_params[t-1]
 	run(**xargs, task_id=t, results_dir=rd)

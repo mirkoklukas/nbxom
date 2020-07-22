@@ -2,12 +2,9 @@
 
 __all__ = ['extract_tag', 'contains_tag', 'is_nbx', 'is_nbx_cell', 'is_magic_or_shell', 'strip', 'parse_xarg',
            'get_imports_from_src', 'Import', 'create_import_statement', 'extract_imports_from', 'Bunch', 'load_nb',
-           'parse_src', 'parse_nbx_cell', 'parse_src_with_parse_dict', 'parse_none', 'parse_nbx', 'parse_xarg',
-           'parse_xuse', 'parse_nbx_cell_with_parse_dict', 'PARSE_DICT', 'concat', 'unzip', 'negate', 'is_constarg',
-           'get_item', 'get_items', 'not_constarg', 'parse_nb', 'parse_xarg_line', 'parse_nb_with_parse_dict',
-           'get_arrays', 'init_job', 'cont_job', 'chain_jobs', 'check_parsed_nb', 'NbxBundle', 'BUNDLE_SUMMARY',
-           'add_if_necessary', 'create_script', 'create_om_files', 'create_folders', 'create_run_script',
-           'create_job_script', 'check_nb', 'create_experiment_script', 'tpath', 'INSTRUCTIONS']
+           'parse_src', 'parse_nbx_cell', 'concat', 'unzip', 'negate', 'is_constarg', 'get_item', 'get_items',
+           'not_constarg', 'parse_nb', 'get_arrays', 'init_job', 'cont_job', 'chain_jobs', 'check_parsed_nb',
+           'NbxBundle', 'BUNDLE_SUMMARY']
 
 #Cell
 #default_exp om
@@ -166,53 +163,6 @@ def parse_nbx_cell(cell):
     return a['xarg'], a['xbody']
 
 #Cell
-def parse_src_with_parse_dict(a, src, parse_dict):
-    if len(src) == 0: return a, []
-
-    tag = extract_tag(src[0])
-    if tag is None or tag not in parse_dict: a, rest = parse_none(a, src)
-    else: a, rest = parse_dict[tag](a, src)
-
-    return parse_src_with_parse_dict(a, rest, parse_dict)
-
-
-def parse_none(a, src):
-    if not is_magic_or_shell(src[0]):
-        a['none'].append(src[0])
-    rest = src[1:]
-    return a, rest
-
-
-def parse_nbx(a, src):
-    a["nbx"].append(src[0])
-    rest = src[1:]
-    return a, rest
-
-def parse_xarg(a, src):
-    a["xarg"].append(src[1])
-    rest = src[2:]
-    return a, rest
-
-def parse_xuse(a, src):
-    a["xuse"].append(src[1])
-    rest = src[2:]
-    return a, rest
-
-
-PARSE_DICT = {
-    'xarg': parse_xarg,
-    'xuse': parse_xuse}
-
-def parse_nbx_cell_with_parse_dict(cell, parse_dict=PARSE_DICT):
-    a = dict([(t,[]) for t in parse_dict.keys()])
-    a['none'] = []
-
-    a, _ = parse_src_with_parse_dict(a, cell['source'], parse_dict)
-    return a
-
-# def parse_nb_with_parse_dict()
-
-#Cell
 from functools import reduce
 
 def concat(list1, list2):
@@ -256,39 +206,6 @@ def parse_nb(nb):
     pnb.sweep_args = list(map(get_items(0,2), filter(not_constarg, xargs)))
 
     return pnb
-
-
-#Cell
-
-
-def parse_xarg_line(line):
-    m = _re_xarg.match(line)
-    name, val, sweep = map(strip, m.groups())
-    return name, val, sweep
-
-
-def parse_nb_with_parse_dict(nb, parse_dict=PARSE_DICT):
-    nbx_cells = filter(is_nbx_cell, nb.cells)
-
-    keys = parse_dict
-    A = dict([(k,[]) for k in parse_dict.keys()])
-    A['func_body'] = []
-    for cell in nbx_cells:
-        a = parse_nbx_cell_with_parse_dict(cell, parse_dict)
-
-        for k in parse_dict.keys():
-            A[k].extend(a[k])
-        A['func_body'].extend(a['none'])
-
-    print(A['xarg'])
-    A['xarg'] = [parse_xarg_line(line) for line in A['xarg']]
-    A['args'] = list(map(get_items(0,1), A['xarg']))
-    A['const_args'] = list(map(get_items(0,1), filter(is_constarg, A['xarg'])))
-    A['sweep_args'] = list(map(get_items(0,2), filter(not_constarg, A['xarg'])))
-    A['name'] = nb.name
-
-
-    return A
 
 
 #Cell
@@ -486,111 +403,3 @@ Instructions:
     - `bundle.run()` or `ssh $om sbatch -D $omx/{{path}} $omx/{{path}}/run.sh`
     - `bundle.pull_results()` or `scp -r $om:$omx/{{path}}/results ./results`
 """
-
-
-#Cell
-def add_if_necessary(d, k, v):
-    if k not in d:
-        d[k] = v
-
-
-def create_script(tpath, tname, fname, vars):
-    print(f"Creating... {fname} \n\tfrom {tname}")
-    create_file_from_template(tpath/tname, fname, vars)
-
-
-tpath = Path(pkg_resources.resource_filename(__name__, "templates/"))
-
-
-def create_om_files(target_dir, lang, num_jobs, simg, job_header, arr_size=1000, step=20):
-    print(f"Creating om ... files...\n\tfrom {tpath}")
-
-    create_folders(target_dir, lang)
-    create_run_script(target_dir, num_jobs, arr_size, step)
-    create_job_script(target_dir, lang, simg, job_header)
-
-    print(render_template_from_string(INSTRUCTIONS, {"path": target_dir}))
-
-
-INSTRUCTIONS = """
-** Instructions: **
-    Copy to remote, run the bash script, and pull the results:
-    - `scp -r {{path}} $om:$omx`
-    - `ssh $om sbatch -D $omx/{{path}} $omx/{{path}}/run.sh`
-    - `scp -r $om:$omx/{{path}}/results ./results`
-
-    Num params:
-    - `!julia -e 'include("{{path}}/experiment.jl"); println(length(sweep_params))'`
-"""
-
-
-def create_folders(path, lang):
-    path=Path(path)
-
-    if not os.path.exists(path):
-        os.makedirs(path)
-        os.makedirs(path/'io')
-        os.makedirs(path/'results')
-
-    if os.path.exists('./src'):
-        if not os.path.exists(path/'src'):
-            os.makedirs(path/'src')
-        os.system(f"cp -r src/* {path/'src'}")
-
-    if os.path.exists('./data'):
-        if not os.path.exists(path/'data'):
-            os.makedirs(path/'data')
-        os.system(f"cp -r data/* {path/'data'}")
-
-    if lang==".py":
-        open(path/'__init__.py', 'a').close()
-
-
-def create_run_script(target_dir, num_jobs, arr_size, step):
-    assert arr_size <= 1000, "Maximum number of queued jobs on OM is 1000"
-    fname = Path(target_dir)/'run.sh'
-    with open(fname, "w", newline="\n") as f:
-        f.write("#!/bin/sh\n\n")
-        f.write("#SBATCH --out=io/runner_out__%A\n")
-        f.write("#SBATCH --error=io/runner_err__%A\n\n")
-        f.write(chain_jobs(get_arrays(num_jobs, arr_size), step))
-
-
-def create_job_script(target_dir, lang, simg, job_header):
-
-    simg        = Path(os.environ['omsimg'])/simg
-    nbx_folder  = Path(os.environ['omx'])
-    results_dir = Path("./results")
-
-    add_if_necessary(job_header, "--out", "io/out_%a")
-    add_if_necessary(job_header, "--error", "io/err_%a")
-    add_if_necessary(job_header, "--mail-type", "END")
-    add_if_necessary(job_header, "--exclude", "node030,node016,node015")
-
-    tname = f"job_{lang}.tpl"
-    fname = Path(target_dir)/'job.sh'
-    create_script(tpath, tname, fname, {
-        'job_header': job_header.items(),
-        'nbx_folder': nbx_folder,
-        'simg': simg,
-        'results_dir': results_dir
-    })
-
-
-def check_nb(pnb):
-    keys = list(map(get_item(0), pnb['args']))
-    if "task_id" not in keys: raise KeyError("You didn't specify `task_id`!!")
-    if "results_dir" not in keys: raise KeyError("You didn't specify `results_dir`!!")
-
-
-def create_experiment_script(target_dir, lang, nbname):
-    nb = load_nb(nbname)
-    nb = parse_nb_with_parse_dict(nb, parse_dict=PARSE_DICT)
-    check_nb(nb)
-
-    tname = f"experiment_{lang}.tpl"
-    fname = Path(target_dir)/f"experiment.{lang}"
-    create_script(tpath, tname, fname, nb)
-
-
-
