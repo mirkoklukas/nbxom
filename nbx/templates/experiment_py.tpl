@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import sys
 sys.path.append("/omx") #This path will be bound to the nbx folder in run.sh
-import numpy as np
+{% for line in ximp %}{{line}}{% endfor %}
 from nbx.pspace import ParameterSpace, Axis
 
 import os

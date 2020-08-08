@@ -1,9 +1,7 @@
 #!/bin/sh
 
-#SBATCH --time=01:20:00
+#SBATCH --time=10:00:00
 #SBATCH --partition=fiete
-#SBATCH --mem=32gb
-#SBATCH --cpus-per-task=20
 #SBATCH --mail-user=me@somewhere.com
 #SBATCH --out=io/out_%a
 #SBATCH --error=io/err_%a
@@ -18,5 +16,5 @@ singularity exec -B /om:/om,/om5:/om5,/om2:/om2,/om2/user/mklukas/nbx-experiment
                                 /om2/user/mklukas/simg/pytorch.simg \
                                 python experiment.py \
                                 --job-id   $SLURM_ARRAY_JOB_ID \
-                                --task-id  $SLURM_ARRAY_TASK_ID \
+                                --task-id  $(($SLURM_ARRAY_TASK_ID + 1000)) \
                                 --results-dir results

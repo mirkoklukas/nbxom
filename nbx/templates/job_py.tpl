@@ -1,6 +1,6 @@
 #!/bin/sh
 
-{% for k,v in job_header %}#SBATCH {{k}}={{v}}
+{% for k,v in job_header %}#SBATCH --{{k}}={{v}}
 {% endfor %}
 
 source /etc/profile.d/modules.sh
@@ -10,5 +10,5 @@ singularity exec -B /om:/om,/om5:/om5,/om2:/om2,{{nbx_folder}}:/omx \
                                 {{simg}} \
                                 python experiment.py \
                                 --job-id   $SLURM_ARRAY_JOB_ID \
-                                --task-id  $SLURM_ARRAY_TASK_ID \
+                                --task-id  $(($SLURM_ARRAY_TASK_ID + {{task_offset}})) \
                                 --results-dir {{results_dir}}

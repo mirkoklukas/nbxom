@@ -2,6 +2,8 @@
 import sys
 sys.path.append("/omx") #This path will be bound to the nbx folder in run.sh
 import numpy as np
+from numpy import *
+
 from nbx.pspace import ParameterSpace, Axis
 
 import os
@@ -13,8 +15,7 @@ parser.add_argument('--task-id', dest="task_id", default=0, type=int)
 parser.add_argument('--results-dir', dest="results_dir", default=Path(__file__).parent/'results', type=str)
 
 sweep_params = ParameterSpace([
-	Axis("x", range(5)),
-	Axis("y", [0,1,2,4])
+	Axis("x", [0,1,2,3,4])
 ])
 
 def print_args(arg_dict):
@@ -23,12 +24,12 @@ def print_args(arg_dict):
 		print(f"\t{k}: {v}")
 
 
-def run(task_id=0, results_dir=".", x=0, y=0):
+def run(x=0, y=0, task_id=0, results_dir="./"):
 	"""
 	This is an auto-generated function 
 	based on the jupyter notebook 
 
-	> OM2 Example - Python.ipynb
+	> om2.ipynb
 	
 	Don't judge, it might look ugly.
 	"""
@@ -37,19 +38,26 @@ def run(task_id=0, results_dir=".", x=0, y=0):
 
 	#nbx
 
+	
+
+	
+
+	
+
+	
+
+	    
+
+	
+
+	
+
+	#watch
+
+	z = 1
 	#nbx
 
-	
-
-	
-
-	
-
-	z=0;
-
-	
-
-	# ...
+	print("some result")
 
 	print("\n**nbx**\nExperiment finished.")
 
