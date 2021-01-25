@@ -9,6 +9,7 @@
 #SBATCH --exclude=node030,node016,node015
 
 
+ 
 source /etc/profile.d/modules.sh
 module add openmind/singularity
 export SINGULARITY_CACHEDIR=/om5/user/`whoami`/.singularity
@@ -16,5 +17,5 @@ singularity exec -B /om:/om,/om5:/om5,/om2:/om2,/om2/user/mklukas/nbx-experiment
                                 /om2/user/mklukas/simg/pytorch.simg \
                                 python experiment.py \
                                 --job-id   $SLURM_ARRAY_JOB_ID \
-                                --task-id  $(($SLURM_ARRAY_TASK_ID + 1000)) \
+                                --task-id  $(($SLURM_ARRAY_TASK_ID + $task_offset)) \
                                 --results-dir results

@@ -4,9 +4,10 @@ __all__ = ['extract_tag', 'regex_tag', 'contains_tag', 'is_nbx', 'is_nbx_cell', 
            'strip', 'parse_xarg_expr', 'regex_xarg', 'Bunch', 'load_nb', 'parse_src_with_parse_dict', 'parse_none',
            'parse_nbx', 'parse_xarg', 'parse_xuse', 'consume_line_below', 'parse_nbx_cell_with_parse_dict',
            'PARSE_DICT', 'concat', 'unzip', 'negate', 'is_constarg', 'get_item', 'get_items', 'not_constarg',
-           'parse_nb_with_parse_dict', 'get_arrays', 'init_job', 'cont_job', 'chain_jobs', 'add_if_necessary',
-           'create_script', 'create_om_files', 'create_folders', 'create_run_script', 'create_job_script', 'check_nb',
-           'create_experiment_script', 'tpath', 'INSTRUCTIONS']
+           'parse_nb_with_parse_dict', 'get_arrays', 'get_arrays_2', 'init_job', 'cont_job', 'chain_jobs',
+           'chain_jobs_2', 'add_if_necessary', 'create_script', 'create_om_files', 'create_folders',
+           'create_run_and_job_script', 'create_job_script', 'check_nb', 'create_experiment_script',
+           'create_raw_experiment', 'tpath', 'INSTRUCTIONS']
 
 #Cell
 #default_exp om2
@@ -127,7 +128,8 @@ def consume_line_below(tag, basket=None):
 
 
 PARSE_DICT = {
-    'xarg': consume_line_below('xarg', basket=None)
+    'xarg': consume_line_below('xarg', basket=None),
+    'ximp': consume_line_below('ximp', basket=None)
 }
 
 def parse_nbx_cell_with_parse_dict(cell, parse_dict=PARSE_DICT):
@@ -196,11 +198,22 @@ def get_arrays(num, m=1000):
 
     return arrays
 
+def get_arrays_2(num, m=1000):
+    if num < m: return [[1,num]]
+
+    arrays = []
+    for i in range(num//m): arrays.append([1, m])
+    last = arrays[-1][1]
+    if num%m!=0: arrays.append([1,num%m])
+
+    return arrays
+
 #Cell
 def init_job(start, end, step):
-    return f"job_0=`sbatch --array={start}-{end}%{step} job.sh | awk '{{ print $4 }}'`"
+    return f"job_0=`sbatch --array={start}-{end}%{step} job_0.sh | awk '{{ print $4 }}'`"
+
 def cont_job(j, start, end, step):
-    return f"job_{j}=`sbatch --array={start}-{end}%{step} --dependency=afterok:$job_{j-1} job.sh | awk '{{ print $4 }}'`"
+    return f"job_{j}=`sbatch --array={start}-{end}%{step} --dependency=afterok:$job_{j-1} job_{j}.sh | awk '{{ print $4 }}'`"
 
 def chain_jobs(arrays, step):
     s = ""
@@ -209,6 +222,17 @@ def chain_jobs(arrays, step):
         else: s += cont_job(i, arr[0], arr[1], step)
         s += "\n"
     return s
+
+def chain_jobs_2(arrays, step):
+    s = ""
+    for i, arr in enumerate(arrays):
+        if i ==0: s += init_job(arr[0], arr[1], step)
+        else: s += cont_job(i, arr[0], arr[1], step)
+        s += "\n"
+    return s
+
+
+
 
 #Cell
 from pathlib import PurePosixPath as Path
@@ -230,7 +254,8 @@ def create_script(tpath, tname, fname, vars):
 tpath = Path(pkg_resources.resource_filename(__name__, "templates/"))
 
 
-def create_om_files(target_dir, lang, num_jobs, simg, job_header, arr_size=1000, step=20):
+def create_om_files(target_dir,  lang, num_jobs, simg, job_header, experiment="experiment.py",
+                    arr_size=900, step=100, tpath=tpath, copy_folders=["data", "src"], job_abbr="nbxjob", bind=[], sym=[]):
     """
     Creates a bundle folder and all the scripts
     needed to run an experiment script on OM...
@@ -238,16 +263,16 @@ def create_om_files(target_dir, lang, num_jobs, simg, job_header, arr_size=1000,
     Example usage:
 
     >> create_om_files(
-            target_dir = "./_EXAMPLE_BUNDLE",
+            target_dir = "EXAMPLE_BUNDLE",
             lang = "py",
             num_jobs = 10,
             simg = "pytorch.simg",
             job_header = {
-                "--time": "01:20:00",
-                "--partition": "fiete",
-                "--mem": "32gb",
-                "--cpus-per-task": 4,
-                "--mail-user": "me@somewhere.com"})
+                "time": "01:20:00",
+                "partition": "fiete",
+                "mem": "32gb",
+                "cpus-per-task": 4,
+                "mail-user": "me@somewhere.com"})
 
     >> create_experiment_script(
             nbname = "my_notebook.ipynb",
@@ -257,17 +282,20 @@ def create_om_files(target_dir, lang, num_jobs, simg, job_header, arr_size=1000,
     """
     print(f"Creating om ... files...\n\tfrom {tpath}")
 
-    create_folders(target_dir, lang)
-    create_run_script(target_dir, num_jobs, arr_size, step)
-    create_job_script(target_dir, lang, simg, job_header)
 
-    print(render_template_from_string(INSTRUCTIONS, {"path": target_dir}))
+    create_folders(target_dir, lang, copy_folders=copy_folders)
+    create_run_and_job_script(target_dir, lang, simg, job_header, num_jobs,
+                              arr_size, step,  tpath=tpath, job_abbr=job_abbr, bind=bind, sym=sym, experiment=experiment)
+#     create_job_script(target_dir, lang, simg, job_header)
+
+    print(render_template_from_string(INSTRUCTIONS, {"path": target_dir, "lang": lang}))
 
 
 INSTRUCTIONS = """
 ** Instructions: **
     Copy to remote, run, and pull the results:
     - `!scp -r {{path}} $om:$omx`
+   (- `!scp -r {{path}}/experiment.{{lang}} $om:$omx/experiment.{{lang}}`)
     - `!ssh $om sbatch -D $omx/{{path}} $omx/{{path}}/run.sh`
     - `!scp -r $om:$omx/{{path}}/results/* ./results`
 
@@ -276,56 +304,74 @@ INSTRUCTIONS = """
 """
 
 
-def create_folders(path, lang):
+def create_folders(path, lang, copy_folders):
     path=Path(path)
 
 
     for p in [path, path/'io', path/'results']:
         if not os.path.exists(p): os.makedirs(p)
 
+    for folder in copy_folders:
+        if os.path.exists(f"./{folder}"):
+            if not os.path.exists(path/folder):
+                os.makedirs(path/folder)
+            os.system(f"cp -r {folder}/* {path/folder}")
 
-    if os.path.exists('./src'):
-        if not os.path.exists(path/'src'):
-            os.makedirs(path/'src')
-        os.system(f"cp -r src/* {path/'src'}")
 
-    if os.path.exists('./data'):
-        if not os.path.exists(path/'data'):
-            os.makedirs(path/'data')
-        os.system(f"cp -r data/* {path/'data'}")
 
     if lang==".py":
         open(path/'__init__.py', 'a').close()
 
 
-def create_run_script(target_dir, num_jobs, arr_size, step):
+def create_run_and_job_script(target_dir, lang, simg, job_header,
+                              num_jobs, arr_size, step,  tpath=tpath,
+                              job_abbr="nbxjob", bind=[], sym=[], experiment="experiment.py"):
     assert arr_size <= 1000, "Maximum number of queued jobs on OM is 1000"
     fname = Path(target_dir)/'run.sh'
-    with open(fname, "w", newline="\n") as f:
-        f.write("#!/bin/sh\n\n")
-        f.write("#SBATCH --out=io/runner_out__%A\n")
-        f.write("#SBATCH --error=io/runner_err__%A\n\n")
-        f.write(chain_jobs(get_arrays(num_jobs, arr_size), step))
+
+    job_arrays = get_arrays_2(num_jobs, arr_size)
+
+    # Run script
+    tname = "run_sh.tpl"
+    fname = Path(target_dir)/f"run.sh"
+    create_script(tpath, tname, fname, {
+        'specs_array': [[j]+job_arrays[j]+[j*arr_size]
+                             for j in range(len(job_arrays))],
+        'job_name': f"{job_abbr}",
+        'step': step
+    })
+
+    # Jobs
+    create_job_script(target_dir, lang, simg, job_header, tpath, bind, sym, experiment)
+#     for j,arr in enumerate(job_arrays):
+#         task_offset = j*arr_size
+#         create_job_script(target_dir, lang, simg, j, job_header, task_offset, tpath)
 
 
-def create_job_script(target_dir, lang, simg, job_header):
+
+def create_job_script(target_dir, lang, simg, job_header, tpath, bind=[], sym=[], experiment="experiment.py"):
 
     simg        = Path(os.environ['omsimg'])/simg
     nbx_folder  = Path(os.environ['omx'])
     results_dir = Path("./results")
 
-    add_if_necessary(job_header, "--out", "io/out_%a")
-    add_if_necessary(job_header, "--error", "io/err_%a")
-    add_if_necessary(job_header, "--mail-type", "END")
-    add_if_necessary(job_header, "--exclude", "node030,node016,node015")
+    print(f"\nNBX folder: {nbx_folder}\n")
+
+    add_if_necessary(job_header, "out", "io/out_%a")
+    add_if_necessary(job_header, "error", "io/err_%a")
+    add_if_necessary(job_header, "mail-type", "END")
+    add_if_necessary(job_header, "exclude", "node030,node016,node015")
 
     tname = f"job_{lang}.tpl"
-    fname = Path(target_dir)/'job.sh'
+    fname = Path(target_dir)/f"job.sh"
     create_script(tpath, tname, fname, {
         'job_header': job_header.items(),
         'nbx_folder': nbx_folder,
+        'bind': bind,
         'simg': simg,
-        'results_dir': results_dir
+        'symlinks': sym,
+        'results_dir': results_dir,
+        'experiment': experiment
     })
 
 
@@ -335,7 +381,7 @@ def check_nb(pnb):
     if "results_dir" not in keys: raise KeyError("You didn't specify `results_dir`!!")
 
 
-def create_experiment_script(nbname, target_dir=".", lang="py"):
+def create_experiment_script(nbname, target_dir=".", lang="py", tpath=tpath):
     print("** Creating Experiment script and folder **")
     nb = load_nb(nbname)
     nb = parse_nb_with_parse_dict(nb, parse_dict=PARSE_DICT)
@@ -360,6 +406,18 @@ def create_experiment_script(nbname, target_dir=".", lang="py"):
     print(f"Number of params: {num_params}")
 
     return {"num_jobs": num_params, "target_dir": target_dir, "lang": lang}
+
+
+def create_raw_experiment(fname="experiment.py", lang="py", tpath=tpath):
+    print("** Creating Raw Experiment**")
+
+    tname = f"experiment_raw_{lang}.tpl"
+    fname = Path(fname)
+
+    create_script(tpath, tname, fname, {})
+
+
+
 
 
 

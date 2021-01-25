@@ -20,9 +20,11 @@ from collections import OrderedDict
 
 
 class ParameterSpace():
-    def __init__(self, axes):
+    def __init__(self, axes, _locals={}):
+        self._locals = _locals
         self._axes = OrderedDict()
         self._keys = []
+        self._init = {}
         self.shape = ()
 
         if isinstance(axes, dict):
@@ -44,12 +46,26 @@ class ParameterSpace():
 
         return x
 
+    def add(self, key, init, vals):
+            print(f"...{key}={init}; {vals}")
+            self._axes[key] = vals
+            self._keys.append(key)
+            self.shape += (len(vals),)
+            self._init[key] = init
+            exec(f"{key}={init};", None, self._locals)
 
     def _add_axis(self, key, vals):
             self._axes[key] = vals
             self._keys.append(key)
             self.shape += (len(vals),)
+            self._init[key] = vals[0]
 
+    def reset(self, t):
+        c = self[t]
+        print("Resetting:")
+        for k,v in c.items():
+            print(f"...{k}={v}")
+            exec(f"{k}={v};", None, self._locals)
 
     @staticmethod
     def _get_multi_index(t, shape):
@@ -63,6 +79,7 @@ class ParameterSpace():
 
 
     def __getitem__(self, i):
+        if i == -1: return self._init
         I = self._get_multi_index(i,self.shape)
         c = {}
         for k,i in enumerate(I):
@@ -71,8 +88,8 @@ class ParameterSpace():
 
         return c
 
-    def __call__(self, t):
-        return self[t]
+    def __call__(self, key, init, vals):
+        return self.add(key, init, vals)
 
 
     def _coords(self, c):

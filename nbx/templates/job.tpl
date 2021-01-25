@@ -6,8 +6,8 @@
 #SBATCH --mem-per-cpu={{mem_per_cpu}}
 #SBATCH --mail-type=END
 #SBATCH --mail-user={{mail_user}}
-#SBATCH --out=io/out_%a
-#SBATCH --error=io/err_%a
+#SBATCH --out=io/out_%x_%a
+#SBATCH --error=io/err_%x_%a
 #SBATCH --exclude=node030,node016
 
 source /etc/profile.d/modules.sh
